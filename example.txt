@@ -1,0 +1,314 @@
+ public class ProductExtended
+ {
+     public ProductExtended(Model.Product product)
+     {
+         this.Product = product;
+     }
+     public Model.Product Product { get; set; }
+
+     //строка с заглушкой или фото+папка
+     public string ProductPhotoPath
+     {
+         get
+         {
+             string temp = Environment.CurrentDirectory + "/Images/" + Product.ProductPhoto;
+             if (!File.Exists(temp))
+             {
+                 temp = "/Resources/picture.png";
+
+             }
+             return temp;
+         }
+
+     }
+
+     //цена со скидкой
+     private double productCostWithDiscount;
+     public double ProductCostWithDiscount
+     {
+         get
+         {
+             double temp = 0.0;
+             double discount = (double)Product.ProductCost * (double)Product.ProductDiscount / 100;
+             temp = (double)Product.ProductCost - discount;
+             return temp;
+         }
+         set
+         {
+             productCostWithDiscount = value;
+         }
+     }
+ }
+
+public class OrderExtended
+{
+    //Свойства класса
+    public OOO_SportProducts.Model.Order Order { get; set; }		//Связь с моделью
+
+    public double TotalSumma { get; set; }	//Сумма всего заказа
+    public double TotalDiscount { get; set; }   //Суммарная скидка
+
+
+    public double TotalDiscountPercent  //Свойство класса – суммарная скидка в %
+    {
+        get
+        {
+            return TotalDiscount * 100 / TotalSumma;
+        }
+    }
+
+    /// Метод расчета суммы заказа по номеру заказа
+    public double CalcTotalSummma(List<OOO_SportProducts.Model.OrderProduct> productsInOrder)
+    {
+        double total = 0;
+        //Перебор всех заказанных товаров
+        foreach (var item in productsInOrder)
+        {
+            if (item.OrderID == Order.OrderID )	//Выделение только товаров текущего заказа
+            {
+                total += (double)(item.Product.ProductCost * item.ProductCount);
+            }
+        }
+        return total;
+    }
+
+    /// Метод расчета суммарной скидки заказа по номеру заказа
+    public double CalcTotalDiscount(List<OOO_SportProducts.Model.OrderProduct> productsInOrder)
+    {
+        double total = 0;
+        foreach (var item in productsInOrder)
+        {
+            if (item.OrderID == Order.OrderID)
+            {
+                //Стоимость товара с учетом скидки
+                double discountAmount = (double)item.Product.ProductCost * (item.Product.ProductDiscount / 100.0);
+                total += discountAmount * item.ProductCount;
+            }
+        }
+        return total;
+    }
+
+
+    public SolidColorBrush BackgroundColor
+    {
+        get
+        {
+            var allInStorage = true; //все товары есть на складе
+
+            foreach(var item in Order.OrderProduct)
+            {
+                if (item.ProductCount < 3)
+                {
+                    allInStorage = false;
+                    break;
+                }
+            }
+
+            if (!allInStorage)
+            {
+                return new SolidColorBrush(Color.FromArgb(255, 255, 140, 0));
+            }
+            else
+            {
+                return new SolidColorBrush(Color.FromArgb(255, 32, 178, 170));
+            }
+        }
+    }
+
+
+
+internal class Helper
+{
+     public static OOO_SportProducts.Model.DBsport403Entities dBSportEntities { get; set; } //доступное свойство связи с бд
+
+    //Доступное свойство пользователя системы
+    public static OOO_SportProducts.Model.User User { get; set; }
+}
+
+
+<Grid Grid.Row="1">
+            <DataGrid x:Name="MainGrid" AutoGenerateColumns="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Order Point" Binding="{Binding Point.PointAddress}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+ private void Load(object sender, RoutedEventArgs e)
+        {
+            var dbContext = new CityDrive.DBSportEntities();
+
+            var orders = dbContext.Order.ToList();
+
+            MainGrid.ItemsSource = orders;
+        }
+
+
+<Style x:Key ="Title">
+    <Setter Property="Control.FontFamily" Value="Comic Sans MS"/>
+    <Setter Property="Control.FontSize" Value="20"/>
+</Style>
+<Style x:Key="Normal">
+    <Setter Property="Control.FontFamily" Value="Comic Sans MS"/>
+    <Setter Property="Control.FontSize" Value="16"/>
+</Style>
+
+    <Grid x:Name="gridMaket">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--Заголовок-->
+        <Grid Grid.Row="0" Background="#FFFFCC9B">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Resources/logo.png" Margin="5"/>
+            <TextBlock Text="Авторизация"  Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource Title}"/>
+            <Button Name="butNavigation" Grid.Column="2" Background="#FFCC6600" Content="Выход" Margin="15" Style="{StaticResource Title}" Foreground="White" Click="butNavigation_Click"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.3*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Text="Логин:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="15" Style="{StaticResource Normal}"/>
+            
+            <TextBlock Text="Пароль:" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="15" Style="{StaticResource Normal}"/>
+            
+            <TextBox Name="tbLogin" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="15,0,0,0" Width="254" Style="{StaticResource Normal}" />
+            
+            <PasswordBox Name="tbPassword" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="15,0,0,0" Width="254" Style="{StaticResource Normal}" />
+            
+            <TextBox Name="tbPasswordDisplay" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="15,0,0,0" Width="254" Style="{StaticResource Normal}" Visibility="Collapsed" />
+            
+            <Button Name="butGuest" Grid.Column="0" Grid.Row="3" Background="#FFCC6600" Content="Гость" Margin="221,51,15,6" Style="{StaticResource Normal}" Foreground="White" Click="butGuest_Click"/>
+            
+            <Button Name="butEnter" Grid.Column="1" Grid.Row="3" Background="#FFCC6600" Content="Войти" Margin="15,51,200,6" Style="{StaticResource Normal}" Foreground="White" Click="butEnter_Click"/>
+            
+            <CheckBox x:Name="isVisiblePassword" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="286,0,0,0" Checked="isVisiblePassword_Checked" Unchecked="isVisiblePassword_Unchecked"/>
+            
+            <easy:Captcha x:Name="captcha"  Height="40" Width="200" Grid.Row ="2" Grid.Column="0"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,0,59" Grid.RowSpan="2" Visibility="Hidden"/>
+
+            <TextBox Name="CaptchaEnter" Grid.Column="1" Grid.Row="3" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="15,8,0,0" Width="254" Style="{StaticResource Normal}" Visibility="Hidden" />
+        </Grid>
+    </Grid>
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--Заголовок-->
+        <Grid Grid.Row="0" Background="#FFFFCC9B">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="/Resources/logo.png" Margin="5"/>
+            <TextBlock Text="Каталог товаров"  Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource Title}"/>
+            <Button x:Name="buttonNavigation" Grid.Column="2" Background="#FFCC6600" Content="Назад" Margin="15" Style="{StaticResource Title}" Foreground="White" Click="buttonNavigation_Click" />
+        </Grid>
+        <!--Функциональная часть-->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.3*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="tbCount" Text="Количество:" Style="{StaticResource Normal}"/>
+                <Button x:Name="butViewOrder" Content="Оформление заказа" Style="{StaticResource Title}"  Margin="50 0" Click="butViewOrder_Click"/>
+            </StackPanel>
+            <!--лево - список товаров-->
+            <ListBox x:Name="listBoxProducts"  Grid.Row="1" Grid.Column="0">
+                
+                <ListBox.ContextMenu>
+
+                    <ContextMenu Name="cmAddInOrder">
+                        <MenuItem Name="MenuItemAdd" Header="Добавить в корзину" Visibility="Hidden"/>
+                        <MenuItem Name="miAddInOrder" Header="Добавить в корзину" Click="miAddInOrder_Click">
+                            
+                        </MenuItem>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+                
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="500"/>
+                                <ColumnDefinition Width="400"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image Source="{Binding Path=ProductPhotoPath}" Width="100" Height="100" Stretch="Uniform" Grid.Column="0"/>
+
+
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                
+
+                                <TextBlock Text="{Binding Path=Product.ProductArticle}" Visibility="Collapsed"/>
+                                <TextBlock Text="{Binding Path=Product.ProductName}" Style="{StaticResource Title}"/>
+                                <TextBlock Text="{Binding Path=Product.ProductDiscription}" Style="{StaticResource Normal}"/>
+                                <TextBlock Text="{Binding Path=Product.ProductManufacturer, StringFormat=Производитель: {0}}" Style="{StaticResource Normal}"/>
+                                <TextBlock Text="{Binding Path=Product.ProductCost, StringFormat=Цена: {0} руб.}" Style="{StaticResource Normal}" />
+                                <TextBlock Text="{Binding Path=Product.ProductDiscount, StringFormat=Скидка: {0} %}" Style="{StaticResource Normal}"/>
+                                <TextBlock Text="{Binding Path=Product.ProductCostWithDiscount, StringFormat=Цена со скидкой: {0} руб.}" Style="{StaticResource Normal}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Vertical">
+                                <TextBlock Text="{Binding Path=Product.ProductCount, StringFormat=Количество на складе: {0} шт.}" Style="{StaticResource Title}"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!--Право - фильтр-->
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
+                <TextBlock Text="Фильтры" Style="{StaticResource Title}" HorizontalAlignment="Center"/>
+                <TextBlock Text="Сортировка по стоимости" Style="{StaticResource Normal}"/>
+                <ComboBox x:Name="cbSort" SelectionChanged="cbSort_SelectionChanged" >
+                    <ComboBoxItem Content="По возрастанию"/>
+                    <ComboBoxItem Content="По убыванию"/>
+                </ComboBox>
+                <TextBlock Text="Фильтрация по скидке" Style="{StaticResource Normal}"/>
+                <ComboBox x:Name="cbFilterDiscount" SelectionChanged="cbFilterDiscount_SelectionChanged">
+                    <ComboBoxItem Content="Все диапазоны"/>
+                    <ComboBoxItem Content="0-9,99%"/>
+                    <ComboBoxItem Content="10-14,99%"/>
+                    <ComboBoxItem Content="15% и более"/>
+                </ComboBox>
+                <TextBlock Text="Фильтрация по категории" Style="{StaticResource Normal}"/>
+                <ComboBox x:Name="cbFilterCategory" SelectionChanged="cbFilterCategory_SelectionChanged">
+
+                </ComboBox>
+                <TextBlock Text="Поиск по названию" Style="{StaticResource Normal}"/>
+                <TextBox x:Name="tbSearch" Style="{StaticResource Normal}" TextChanged="tbSearch_TextChanged"/>
+
+            </StackPanel>
+        </Grid>
+
+    </Grid>
