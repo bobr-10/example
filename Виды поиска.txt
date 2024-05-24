@@ -1,0 +1,21 @@
+// Сортировка по убыванию и возрастанию
+if (cbSort.SelectedIndex == 1)
+{
+    requests = requests.OrderBy(r => r.RequestDateAdd).ToList();
+}
+else if (cbSort.SelectedIndex == 2)
+{
+    requests = requests.OrderByDescending(r => r.RequestDateAdd).ToList();
+}
+
+// Фильтрация по вторичному ключу статуса
+if (cbStatus.SelectedIndex > 0)
+{
+    requests = requests.Where(r => r.RequestStatus == (int)cbStatus.SelectedValue).ToList();
+}
+
+// Поиск ФИО
+if (tbFullName.Text.Length != 0)
+{
+    requests = requests.Where(r => r.Visitor.VisitorFullName.ToLower().Contains(tbFullName.Text.ToLower())).ToList();
+}

@@ -1,0 +1,40 @@
+<!--Табличный вид-->
+<DataGrid Grid.Column="0" ItemsSource="{Binding Visitors}" IsReadOnly="True" AutoGenerateColumns="False">
+    <DataGrid.Columns>
+        <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+        <DataGridTextColumn Header="Имя" Binding="{Binding Name}"/>
+        <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}"/>
+        <DataGridTextColumn Header="Почта" Binding="{Binding Email}"/>
+        <DataGridTextColumn Header="Организация" Binding="{Binding Organization}"/>
+        <DataGridTextColumn Header="Описание" Binding="{Binding Description}"/>
+        <DataGridTextColumn Header="День рождения" Binding="{Binding Birthday}"/>
+        <DataGridTextColumn Header="Паспорт" Binding="{Binding Passport}"/>
+    </DataGrid.Columns>
+</DataGrid>
+
+<!--Строковый вид-->
+<ListBox Grid.Column="0" ItemsSource="{Binding Visitors}">
+    <ListBox.ItemTemplate>
+        <DataTemplate>
+            <StackPanel Margin="5">
+                <TextBlock Text="{Binding Path=Id}"/>
+                <TextBlock Text="{Binding Path=Name}"/>
+                <TextBlock Text="{Binding Path=Phone}"/>
+                <TextBlock Text="{Binding Path=Email}"/>
+                <TextBlock Text="{Binding Path=Organization}"/>
+                <TextBlock Text="{Binding Path=Description}"/>
+                <TextBlock Text="{Binding Path=Birthday}"/>
+                <TextBlock Text="{Binding Path=Passport}"/>
+            </StackPanel>
+        </DataTemplate>
+    </ListBox.ItemTemplate>
+</ListBox>
+
+
+// Создать поле в классе
+public List<Visitor> Visitors { get; set; }
+
+// Получение данных из БД (в конструкторе класса)
+DataContext = this;
+var context = new ApplicationContext();
+Visitors = context.Visitor.ToList();

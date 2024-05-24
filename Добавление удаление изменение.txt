@@ -1,0 +1,44 @@
+// Добавление
+public void AddOrder(string orderName, int userId)
+{
+    using (var context = new ApplicationDbContext())
+    {
+        var order = new Order
+        {
+            Name = orderName,
+            UserId = userId
+        };
+
+        context.Orders.Add(order);
+        context.SaveChanges();
+    }
+}
+
+// Удаление
+public void DeleteOrder(int orderId)
+{
+    using (var context = new ApplicationDbContext())
+    {
+        var order = context.Orders.Find(orderId);
+        if (order != null)
+        {
+            context.Orders.Remove(order);
+            context.SaveChanges();
+        }
+    }
+}
+
+// Редактирование
+public void EditOrder(int orderId, string newName)
+{
+    using (var context = new ApplicationDbContext())
+    {
+        var order = context.Orders.Find(orderId);
+        if (order != null)
+        {
+            order.Name = newName;
+
+            context.SaveChanges();
+        }
+    }
+}

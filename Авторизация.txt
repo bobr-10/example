@@ -1,0 +1,14 @@
+// Авторизация
+var context = new ApplicationContext();
+if (context.User.Any(user => user.Login == textBox_Login.Text && user.Password == textBox_Password.Text))
+{
+    // Действия, которые нужно выполнить, если данные верны
+}
+
+// Получение пользователя по его данным
+var context = new ApplicationContext();
+var user = context.User.FirstOrDefault(user => user.Login == textBox_Login.Text && user.Password == textBox_Password.Text);
+if (user != null)
+{
+    // Действия, которые нужно выполнить, если пользователь найден
+}

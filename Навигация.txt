@@ -1,0 +1,8 @@
+// Создаём новое окно
+this.Hide();
+var window = new Window2();
+window.ShowDialog();
+this.Show();
+
+// Чтобы вернуться назад, в Window2 пишем
+this.Close();
